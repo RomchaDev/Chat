@@ -39,7 +39,7 @@ public class RegAuthService {
     public boolean register(Account account) {
         boolean isUnique = true;
         for (Account acc : MainSQLWorker.getUsers())
-            isUnique &= !account.equals(acc);
+            isUnique &= !account.equals(acc) && !acc.getName().equals(account.getName());
 
         if (isUnique)
             MainSQLWorker.addUser(account.getName(), account.getLogin(), account.getPass());

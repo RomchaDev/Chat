@@ -6,26 +6,6 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-/*        if (log.exists()) {
-                try (BufferedReader reader = new BufferedReader(new FileReader(log))) {
-                while (reader.readLine() != null)
-                viewMessageTEXT.appendText(reader.readLine());
-                } catch (IOException e) {
-                e.printStackTrace();
-                }
-                } else {
-                try {
-                log.createNewFile();
-                } catch (IOException e) {
-                e.printStackTrace();
-                }
-                }
-
-                try {
-                logWriter = new PrintWriter(new FileOutputStream(log));
-                } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                }*/
 public class ClientStarter extends Application {
     private Scene mainSENE;
     private Scene authSCENE;

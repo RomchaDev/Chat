@@ -47,12 +47,13 @@ public class AuthorisationController {
                 if (name != null) {
                     timeThread.stop();
                     ClientStarter.getInstance().loadScene(Scenes.MAIN);
+                    MainWindowController.getInstance().initHistoryFile();
                 } else {
                     System.out.println("error");
-                    JOptionPane.showMessageDialog(null, "This user has been already using the app");
+                    JOptionPane.showMessageDialog(null, "This user has been already using the app or you have entered wrong data");
                 }
             } catch (IOException | ClassNotFoundException e) {
-                JOptionPane.showMessageDialog(null, "Some problems with server or connection", "Problem", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Some problems with server or your connection", "Problem", JOptionPane.ERROR_MESSAGE);
             }
         } else {
             Platform.runLater(() -> showMessage("You can't connect now, restart the app to connect"));

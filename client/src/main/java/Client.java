@@ -16,15 +16,16 @@ public class Client {
     }
 
     public void sendSimpleMessage(String text) {
-        try {
-            Network.getInstance().sendMessage(new Message(MessageConstants.SIMPLE, name, getter, text));
-            if (!getter.equals("ALL")) {
-                nicks.get(getter).setActive(false);
-                getter = "ALL";
+        if (text != null && !text.equals(""))
+            try {
+                Network.getInstance().sendMessage(new Message(MessageConstants.SIMPLE, name, getter, text));
+                if (!getter.equals("ALL")) {
+                    nicks.get(getter).setActive(false);
+                    getter = "ALL";
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public void setGetter(String getter) {
@@ -60,10 +61,12 @@ public class Client {
     }
 
 
-    public boolean changeName(String name) {
-        if (nicks.get(name) == null) {
+    public boolean changeName(String newName) {
+        if (nicks.get(newName) == null) {
             try {
-                Network.getInstance().sendMessage(new Message(MessageConstants.NICK_CHANGING, this.name, name));
+                Network.getInstance().sendMessage(new Message(MessageConstants.NICK_CHANGING, this.name, newName));
+                this.name = newName;
+                MainWindowController.getInstance().renameHistoryFileTo(newName);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -75,7 +78,7 @@ public class Client {
 
     public void changeElseNick(String oldName, String newName) {
         System.out.println(oldName + " " + newName);
-        if (!oldName.equals(name)) {
+        if (!oldName.equals(name) && !newName.equals(name)) {
             NickField updatedField = nicks.get(oldName);
             updatedField.changeNameTo(newName);
             nicks.remove(oldName);
