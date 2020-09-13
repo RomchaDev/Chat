@@ -6,8 +6,11 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Server {
+    private final Logger logger = Logger.getLogger(Server.class.getName());
     private static final Server server = new Server();
     private final int PORT = 8080;
     private final RegAuthService regAuthService = RegAuthService.getInstance();
@@ -29,11 +32,15 @@ public class Server {
 
     private void listenToNewClients() {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-            System.out.println("Server started");
+
+            logger.severe("Server started");
+
             while (true) {
                 try {
                     Socket socket = serverSocket.accept();
-                    System.out.println("New connection");
+
+                    logger.info("New connection");
+
                     Thread newClientThread = new Thread(() -> {
                         try {
                             ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
@@ -45,13 +52,13 @@ public class Server {
                                     if (message.getType() == MessageConstants.AUTH) {
                                         String name = regAuthService.authorise(new Account(message.getLogin(), message.getPass()), socket, output);
                                         if (name != null) {
-                                            System.out.println(name + " Connected");
+                                            logger.info("Connected");
                                             output.writeObject(new Message(MessageConstants.ACCEPTED, name));
                                             message.setFrom(name);
                                             sendMessageToAllUsers(new Message(MessageConstants.AUTH, name, null, null));
                                             sendUsersInfo(output);
                                         } else {
-                                            System.out.println(message.getFrom() + " wasn't accepted");
+                                            logger.info("Wasn't accepted");
                                             output.writeObject(new Message(MessageConstants.NOT_ACCEPTED));
                                         }
                                         break;
@@ -138,5 +145,9 @@ public class Server {
     public void addNetwork(int id, AccountNetwork net) {
         networks.put(id, net);
         System.out.println(id);
+    }
+
+    public void logMessage(String message) {
+
     }
 }

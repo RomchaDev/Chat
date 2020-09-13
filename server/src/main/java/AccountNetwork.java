@@ -11,10 +11,6 @@ public class AccountNetwork implements Serializable {
     private static final Server server = Server.getInstance();
     private boolean hasClientExited = false;
 
-    public int getId() {
-        return id;
-    }
-
     public AccountNetwork(int id, Socket socket) {
         this.id = id;
         this.socket = socket;
@@ -28,13 +24,13 @@ public class AccountNetwork implements Serializable {
             ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
             while (!hasClientExited) {
                     message = (Message) input.readObject();
-                    System.out.println(message.getText());
+                    server.logMessage(message.getText());
                     server.notifyAboutClientMessage(message);
             }
         } catch (IOException | ClassNotFoundException e) {
             hasClientExited = true;
             server.deleteSubscriber(id - 1);
-            System.out.println(MainSQLWorker.getNameOf(id) + " disconnected");
+            server.logMessage(MainSQLWorker.getNameOf(id) + " disconnected");
         }
     }
 
