@@ -4,7 +4,6 @@ public class Message implements Serializable {
     private String from;
     private String text;
     private final MessageConstants type;
-    private String readyMessage;
     private String login;
     private String pass;
     private String oldName;

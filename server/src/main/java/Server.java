@@ -6,6 +6,8 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Server {
     private static final Server server = new Server();
@@ -13,6 +15,17 @@ public class Server {
     private final RegAuthService regAuthService = RegAuthService.getInstance();
     private final Thread newClientListener = new Thread(this::listenToNewClients);
     private final Map<Integer, AccountNetwork> networks = new HashMap<>();
+
+    /**
+    * Использую ExecutorService так как это гараздо удобнее чем
+    * каждый раз создавать новый поток. Выбрал CachedThreadPoolExecutor
+    * потому что таким образом авторизоваться одновременно может достаточно
+    * большое количество пользователей. Но если вдруг возникнет проблема с
+    * производительностю, то можно ограничить максимальное количество
+    * пользователей авторизующихся одновременно с помощю fixedThreadPoolExecutor
+    *
+    * */
+    private final ExecutorService newClientService = Executors.newCachedThreadPool();
 
     public static void startListening() {
         server.newClientListener.start();
@@ -34,7 +47,7 @@ public class Server {
                 try {
                     Socket socket = serverSocket.accept();
                     System.out.println("New connection");
-                    Thread newClientThread = new Thread(() -> {
+                    newClientService.execute(() -> {
                         try {
                             ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
                             ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
@@ -65,6 +78,7 @@ public class Server {
                                             output.writeObject(new Message(MessageConstants.NOT_ACCEPTED));
                                         break;
                                     }
+
                                 } catch (IOException | ClassNotFoundException e) {
                                     e.printStackTrace();
                                 }
@@ -74,7 +88,6 @@ public class Server {
                         }
 
                     });
-                    newClientThread.start();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
